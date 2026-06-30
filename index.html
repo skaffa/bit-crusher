@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DATA_CRUSHER // GitHub_Pages_Production</title>
+    <title>DATA_CRUSHER // Dynamic Media Compressor</title>
     <script src="https://unpkg.com/omggif@1.0.10/omggif.js"></script>
     <script src="https://unpkg.com/gifshot@0.4.5/dist/gifshot.min.js"></script>
     <style>
@@ -171,18 +171,53 @@
             margin-left: 0.5rem;
         }
 
+        .tooltip-icon {
+            background: var(--border);
+            color: var(--text-muted);
+            width: 14px;
+            height: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            border-radius: 50%;
+            cursor: help;
+            position: relative;
+            margin-left: 4px;
+        }
+
+        .tooltip-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: var(--text);
+            border: 1px solid var(--border-focus);
+            padding: 0.5rem 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            width: 240px;
+            white-space: normal;
+            z-index: 100;
+            text-transform: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        /* Root Input Range Configuration */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
             width: 100%;
             background: transparent;
-            margin: 10px 0;
         }
 
         input[type="range"]:focus {
             outline: none;
         }
 
+        /* WebKit/Blink standard sliders styling */
         input[type="range"]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
@@ -198,6 +233,24 @@
             margin-top: -5px;
             cursor: pointer;
             -webkit-appearance: none;
+            border-radius: 0;
+        }
+
+        /* Firefox standard sliders styling */
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border: none;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            height: 14px;
+            width: 14px;
+            background: var(--text);
+            border: 1px solid var(--bg);
+            cursor: pointer;
+            border-radius: 0;
         }
 
         select, input[type="number"], input[type="text"] {
@@ -245,6 +298,10 @@
             background: var(--border);
             color: var(--text-muted);
             cursor: not-allowed;
+        }
+
+        #process-btn {
+            margin-top: 1.5rem;
         }
 
         .mini-btn {
@@ -320,7 +377,6 @@
             margin-bottom: 1rem;
             position: relative;
             width: 100%;
-            height: 450px;
             display: grid;
             grid-template-columns: 1fr;
             grid-template-rows: 1fr;
@@ -338,7 +394,8 @@
 
         .comp-layer img, .comp-layer video {
             width: 100%;
-            height: 100%;
+            height: auto;
+            max-height: 65vh;
             object-fit: contain;
             display: block;
         }
@@ -352,6 +409,7 @@
             z-index: 1;
         }
 
+        /* Specialized Split View Layer Scrubber */
         .split-slider-input {
             position: absolute;
             top: 0;
@@ -365,15 +423,35 @@
             cursor: ew-resize;
             margin: 0;
         }
-        .split-slider-input::-webkit-slider-runnable-track { background: transparent !important; border: none !important; height: 100%; }
+        
+        .split-slider-input::-webkit-slider-runnable-track { 
+            background: transparent !important; 
+            border: none !important; 
+            height: 100%; 
+        }
+
+        .split-slider-input::-moz-range-track { 
+            background: transparent !important; 
+            border: none !important; 
+            height: 100%; 
+        }
         
         .split-slider-input::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 2px;
+            width: 4px;
             height: 100%;
             background: var(--accent);
-            box-shadow: 0 0 8px var(--accent);
+            box-shadow: 0 0 14px var(--accent), 0 0 4px var(--accent);
+            cursor: ew-resize;
+        }
+
+        .split-slider-input::-moz-range-thumb {
+            width: 4px;
+            height: 100%;
+            background: var(--accent);
+            box-shadow: 0 0 14px var(--accent), 0 0 4px var(--accent);
+            border: none;
             cursor: ew-resize;
         }
 
@@ -382,8 +460,9 @@
             border: 1px solid var(--border);
             padding: 0.5rem;
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
             font-family: var(--font-mono);
             font-size: 0.75rem;
             margin-bottom: 1.5rem;
@@ -429,7 +508,7 @@
 <div class="container">
     <header>
         <h1>DATA_CRUSHER</h1>
-        <div class="version">SYS_V2.5.0_PRODUCTION</div>
+        <div class="version">SYS_V2.3.0_REVIVED</div>
     </header>
 
     <div id="drop-zone">
@@ -467,9 +546,12 @@
             </div>
 
             <div class="playback-deck hidden" id="video-playback-deck">
-                <button type="button" id="deck-play-btn">PLAY</button>
-                <input type="range" id="deck-scrubber" class="playback-slider" min="0" max="100" value="0">
-                <span id="deck-time-display">00:00 / 00:00</span>
+                <div style="display: flex; align-items: center; gap: 0.75rem; width: 100%;">
+                    <button type="button" id="deck-play-btn">PLAY</button>
+                    <input type="range" id="deck-scrubber" class="playback-slider" min="0" max="100" value="0">
+                    <span id="deck-time-display">00:00 / 00:00</span>
+                </div>
+                <div id="deck-sync-status" style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); padding-left: 0.25rem;"></div>
             </div>
 
             <table class="stats-table">
@@ -500,7 +582,7 @@
 
             <button id="download-btn" class="hidden">Export Compressed Artifact</button>
             <div id="video-warning" class="info-block hidden">
-                * Note: Processing active. Thread allocations managed natively via operational hardware constraints.
+                * Note: Video crushing operates via real-time stream interception. Frame skips may occur under high workloads. Drop resolution or FPS scales lower for stable sizing.
             </div>
         </div>
 
@@ -508,6 +590,7 @@
 </div>
 
 <script>
+    // System script structural diagnostics check
     window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (typeof gifshot === 'undefined') {
@@ -557,6 +640,10 @@
     const statNewSize = document.getElementById('stat-new-size');
     const statEfficiency = document.getElementById('stat-efficiency');
 
+    // Attach dynamic real-time prediction handlers to config fields
+    configFields.addEventListener('input', updateSizePrediction);
+    configFields.addEventListener('change', updateSizePrediction);
+
     splitRangeInput.addEventListener('input', (e) => {
         const val = e.target.value;
         layerOrigBox.style.clipPath = `inset(0 ${100 - val}% 0 0)`;
@@ -585,8 +672,7 @@
         deckPlayBtn.textContent = "PLAY";
         deckScrubber.value = 0;
         rawGifBuffer = null;
-        layerOrigBox.innerHTML = '';
-        layerCompBox.innerHTML = '';
+        document.getElementById('deck-sync-status').textContent = "";
     }
 
     function fallbackToStaticImage(file) {
@@ -600,6 +686,7 @@
             layerOrigBox.appendChild(img);
             setupImageConfig();
             workspace.classList.remove('hidden');
+            updateSizePrediction();
         };
     }
 
@@ -622,6 +709,9 @@
         statOrigSize.textContent = formatBytes(file.size);
         statNewSize.textContent = '-';
         statEfficiency.textContent = '-';
+        
+        layerOrigBox.innerHTML = '';
+        layerCompBox.innerHTML = '';
 
         const dotIdx = file.name.lastIndexOf('.');
         const baseName = dotIdx !== -1 ? file.name.substring(0, dotIdx) : file.name;
@@ -653,6 +743,7 @@
                     
                     setupGifConfig();
                     workspace.classList.remove('hidden');
+                    updateSizePrediction();
                 } catch(err) {
                     fallbackToStaticImage(file);
                 }
@@ -669,6 +760,7 @@
                 layerOrigBox.appendChild(img);
                 setupImageConfig();
                 workspace.classList.remove('hidden');
+                updateSizePrediction();
             };
         } else if (file.type.startsWith('video/')) {
             fileType = 'video';
@@ -687,6 +779,7 @@
                 setupVideoConfig();
                 initPlaybackDeck();
                 workspace.classList.remove('hidden');
+                updateSizePrediction();
             };
         }
     }
@@ -695,14 +788,14 @@
         configFields.innerHTML = `
             <div class="control-group">
                 <div class="label-row">
-                    <label>Spatial Bounds Scale <span class="value" id="val-scale">75%</span></label>
+                    <label>Spatial Bounds Scale <span class="value" id="val-scale">75%</span> <span class="tooltip-icon" data-tooltip="Resizes the physical dimensions of the GIF frames. Decreasing this heavily saves layout weight.">?</span></label>
                 </div>
                 <input type="range" id="param-scale" min="10" max="100" value="75" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
                 <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${Math.round(originalDimensions.width * 0.75)}x${Math.round(originalDimensions.height * 0.75)}</div>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Frame Decimation (Temporal Skip)</label>
+                    <label>Frame Decimation (Temporal Skip) <span class="tooltip-icon" data-tooltip="Subsamples target frames. Higher values drop frames to trim size at the cost of rendering fluidity.">?</span></label>
                 </div>
                 <select id="param-frameskip">
                     <option value="1" selected>Maintain All Original Frames</option>
@@ -712,43 +805,9 @@
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Color Quantization Fidelity <span class="value" id="val-sample">10 (Standard)</span></label>
+                    <label>Color Quantization Fidelity <span class="value" id="val-sample">10 (Standard)</span> <span class="tooltip-icon" data-tooltip="Controls color matching granularity. High sample levels extract fewer colors, shrinking output tables.">?</span></label>
                 </div>
                 <input type="range" id="param-sample" min="1" max="30" value="10" oninput="document.getElementById('val-sample').textContent = this.value">
-            </div>
-        `;
-
-        document.getElementById('param-scale').addEventListener('input', function() {
-            const mod = this.value / 100;
-            const w = Math.max(2, Math.round((originalDimensions.width * mod) / 2) * 2);
-            const h = Math.max(2, Math.round((originalDimensions.height * mod) / 2) * 2);
-            document.getElementById('resolution-projection').textContent = `Target: ${w}x${h}`;
-        });
-    }
-
-    function setupImageConfig() {
-        configFields.innerHTML = `
-            <div class="control-group">
-                <div class="label-row">
-                    <label>Resolution Scale <span class="value" id="val-scale">100%</span></label>
-                </div>
-                <input type="range" id="param-scale" min="1" max="100" value="100" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
-                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${originalDimensions.width}x${originalDimensions.height}</div>
-            </div>
-            <div class="control-group">
-                <div class="label-row">
-                    <label>Quality Factor <span class="value" id="val-quality">80%</span></label>
-                </div>
-                <input type="range" id="param-quality" min="1" max="100" value="80" oninput="document.getElementById('val-quality').textContent = this.value + '%'">
-            </div>
-            <div class="control-group">
-                <div class="label-row">
-                    <label>Output Format Container</label>
-                </div>
-                <select id="param-format">
-                    <option value="image/jpeg">JPEG (Lossy Standard)</option>
-                    <option value="image/webp" selected>WEBP (High Density)</option>
-                </select>
             </div>
         `;
 
@@ -760,30 +819,80 @@
         });
     }
 
+    function setupImageConfig() {
+        configFields.innerHTML = `
+            <div class="control-group">
+                <div class="label-row">
+                    <label>Resolution Scale <span class="value" id="val-scale">100%</span> <span class="tooltip-icon" data-tooltip="Downscales image width/height bounds. Lower percentages mean fewer total processing pixels.">?</span></label>
+                </div>
+                <input type="range" id="param-scale" min="1" max="100" value="100" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
+                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${originalDimensions.width}x${originalDimensions.height}</div>
+            </div>
+            <div class="control-group">
+                <div class="label-row">
+                    <label>Quality Factor <span class="value" id="val-quality">80%</span> <span class="tooltip-icon" data-tooltip="Adjusts lossy matrix compression factor. Lower values drop visual fidelity to shrink size.">?</span></label>
+                </div>
+                <input type="range" id="param-quality" min="1" max="100" value="80" oninput="document.getElementById('val-quality').textContent = this.value + '%'">
+            </div>
+            <div class="control-group">
+                <div class="label-row">
+                    <label>Output Format Container <span class="tooltip-icon" data-tooltip="Changes the target compression layout format. WebP typically maintains better efficiency than standard JPEG.">?</span></label>
+                </div>
+                <select id="param-format">
+                    <option value="image/jpeg">JPEG (Lossy Standard)</option>
+                    <option value="image/webp" selected>WEBP (High Density)</option>
+                </select>
+            </div>
+        `;
+        
+        document.getElementById('param-scale').addEventListener('input', function() {
+            const mod = this.value / 100;
+            const w = Math.max(1, Math.round(originalDimensions.width * mod));
+            const h = Math.max(1, Math.round(originalDimensions.height * mod));
+            document.getElementById('resolution-projection').textContent = `Target: ${w}x${h}`;
+        });
+    }
+
     function setupVideoConfig() {
-        let formatOptions = `<option value="video/webm">WebM Container</option>`;
-        if (MediaRecorder.isTypeSupported('video/mp4')) {
-            formatOptions += `<option value="video/mp4">MP4 / H.264 Container</option>`;
+        // Enumerate and build a wide array of platform supported format permutations
+        const formatsToTest = [
+            { value: 'video/webm', label: 'WebM Container (Standard)' },
+            { value: 'video/webm;codecs=vp8', label: 'WebM (Legacy VP8 Codec)' },
+            { value: 'video/webm;codecs=vp9', label: 'WebM (High Efficiency VP9)' },
+            { value: 'video/webm;codecs=h264', label: 'WebM (H.264 Streams)' },
+            { value: 'video/mp4', label: 'MP4 Container (Standard)' },
+            { value: 'video/mp4;codecs=avc1', label: 'MP4 (AVC1 / H.264 Encoder)' },
+            { value: 'video/x-matroska', label: 'Matroska File (MKV Container)' },
+            { value: 'video/ogg', label: 'Ogg Container (Theora)' }
+        ];
+        
+        let formatOptions = '';
+        formatsToTest.forEach(f => {
+            if (MediaRecorder.isTypeSupported(f.value)) {
+                formatOptions += `<option value="${f.value}">${f.label}</option>`;
+            }
+        });
+        if (!formatOptions) {
+            formatOptions = `<option value="video/webm">WebM Container</option>`;
         }
         
         configFields.innerHTML = `
             <div class="control-group">
                 <div class="label-row">
-                    <label>Resolution Scale <span class="value" id="val-scale">50%</span></label>
+                    <label>Resolution Scale <span class="value" id="val-scale">50%</span> <span class="tooltip-icon" data-tooltip="Alters video canvas recording bounds. Drop down to significantly lessen streaming bitrate weight.">?</span></label>
                 </div>
                 <input type="range" id="param-scale" min="1" max="100" value="50" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
-                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${Math.round(originalDimensions.width * 0.5)}x${Math.round(originalDimensions.height * 0.5)}</div>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Framerate Constraint <span class="value" id="val-fps">15 FPS</span></label>
+                    <label>Framerate Constraint <span class="value" id="val-fps">15 FPS</span> <span class="tooltip-icon" data-tooltip="Locks the target frame polling rate. Lower values produce a staccato style but decrease file weight.">?</span></label>
                     <button type="button" id="btn-orig-fps" class="mini-btn" onclick="toggleNativeFPS()">Match Source</button>
                 </div>
                 <input type="range" id="param-fps" min="1" max="60" value="15" oninput="document.getElementById('val-fps').textContent = this.value + ' FPS'">
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Target Bitrate</label>
+                    <label>Target Bitrate <span class="tooltip-icon" data-tooltip="Sets strict target stream allowance budget. Low bitrates yield small weights but introduce blocky layout artifacts.">?</span></label>
                 </div>
                 <select id="param-bitrate">
                     <option value="10000">10 Kbps (Ultra Crush)</option>
@@ -794,7 +903,7 @@
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Process Speed Throttle</label>
+                    <label>Process Speed Throttle <span class="tooltip-icon" data-tooltip="Accelerates canvas capture via accelerated reproduction. Fast sweeps risk drops on slower devices.">?</span></label>
                 </div>
                 <select id="param-speed">
                     <option value="1">1x (Safest Execution)</option>
@@ -803,21 +912,16 @@
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Output Container Form</label>
+                    <label>Output Container Form <span class="tooltip-icon" data-tooltip="Media wrapper container layout. Supported types rely on browser platform subsystem capabilities.">?</span></label>
                 </div>
                 <select id="param-format">${formatOptions}</select>
             </div>
-            <label class="checkbox-group">
-                <input type="checkbox" id="param-audio"> <span>Strip Audio Node Track</span>
-            </label>
+            <div class="control-group" style="margin-bottom: 2rem;">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="param-audio"> <span>Strip Audio Node Track</span> <span class="tooltip-icon" data-tooltip="Purges all track audio feeds to maximize data space retrieval.">?</span>
+                </label>
+            </div>
         `;
-
-        document.getElementById('param-scale').addEventListener('input', function() {
-            const mod = this.value / 100;
-            const w = Math.max(2, Math.round((originalDimensions.width * mod) / 2) * 2);
-            const h = Math.max(2, Math.round((originalDimensions.height * mod) / 2) * 2);
-            document.getElementById('resolution-projection').textContent = `Target: ${w}x${h}`;
-        });
     }
 
     function toggleNativeFPS() {
@@ -834,6 +938,7 @@
             slider.disabled = false;
             display.textContent = slider.value + ' FPS';
         }
+        updateSizePrediction();
     }
 
     function initPlaybackDeck() {
@@ -844,10 +949,19 @@
             const dur = masterOrigVideo.duration || 0;
             const pct = dur > 0 ? (cur / dur) * 100 : 0;
             deckScrubber.value = pct;
-            deckTimeDisplay.textContent = `${formatTime(cur)} / ${formatTime(dur)}`;
-            if (slaveCompVideo && Math.abs(slaveCompVideo.currentTime - cur) > 0.15) {
-                slaveCompVideo.currentTime = cur;
+            
+            let timeText = `${formatTime(cur)} / ${formatTime(dur)}`;
+            if (slaveCompVideo && slaveCompVideo.duration) {
+                timeText += ` [Crushed Length: ${formatTime(slaveCompVideo.duration)}]`;
             }
+            deckTimeDisplay.textContent = timeText;
+            
+            if (slaveCompVideo && Math.abs(slaveCompVideo.currentTime - cur) > 0.15) {
+                if (cur <= slaveCompVideo.duration) {
+                    slaveCompVideo.currentTime = cur;
+                }
+            }
+            updateSyncStatusDisplay(cur);
         });
 
         deckPlayBtn.onclick = () => {
@@ -867,8 +981,102 @@
             if (!masterOrigVideo) return;
             const targetTime = (e.target.value / 100) * masterOrigVideo.duration;
             masterOrigVideo.currentTime = targetTime;
-            if (slaveCompVideo) slaveCompVideo.currentTime = targetTime;
+            if (slaveCompVideo) {
+                if (targetTime <= slaveCompVideo.duration) {
+                    slaveCompVideo.currentTime = targetTime;
+                } else {
+                    slaveCompVideo.currentTime = slaveCompVideo.duration;
+                }
+            }
         };
+    }
+
+    function updateSyncStatusDisplay(cur) {
+        const statusEl = document.getElementById('deck-sync-status');
+        if (!statusEl) return;
+        if (!slaveCompVideo) {
+            statusEl.innerHTML = "Sync Profile: Awaiting compression processing...";
+            return;
+        }
+
+        const compDur = slaveCompVideo.duration || 0;
+        let infoStr = `Resulting Length: ${formatTime(compDur)}`;
+
+        if (cur > compDur) {
+            infoStr += ` // <span style="color: var(--accent); font-weight: bold;">⚠️ DESYNCED (Crushed stream ended early at ${formatTime(compDur)})</span>`;
+        } else {
+            const diff = Math.abs(cur - slaveCompVideo.currentTime);
+            if (diff > 0.3) {
+                infoStr += ` // <span style="color: var(--accent);">⚠️ DRIFT DETECTION (${diff.toFixed(1)}s timeline lag)</span>`;
+            } else {
+                infoStr += ` // <span style="color: #4ade80;">✓ Fully Synchronized with Original</span>`;
+            }
+        }
+        statusEl.innerHTML = infoStr;
+    }
+
+    function updateSizePrediction() {
+        if (!activeFile) return;
+        let predictedSize = activeFile.size;
+
+        if (fileType === 'image') {
+            const scaleEl = document.getElementById('param-scale');
+            const qualityEl = document.getElementById('param-quality');
+            const formatEl = document.getElementById('param-format');
+
+            const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 1.0;
+            const quality = qualityEl ? parseInt(qualityEl.value) / 100 : 0.8;
+            const format = formatEl ? formatEl.value : 'image/webp';
+
+            const dimFactor = scale * scale;
+            const qualityFactor = 0.15 + 0.85 * quality;
+            const containerFactor = (format === 'image/webp') ? 0.78 : 1.0;
+
+            predictedSize = activeFile.size * dimFactor * qualityFactor * containerFactor;
+
+        } else if (fileType === 'gif') {
+            const scaleEl = document.getElementById('param-scale');
+            const skipEl = document.getElementById('param-frameskip');
+            const sampleEl = document.getElementById('param-sample');
+
+            const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 0.75;
+            const skip = skipEl ? parseInt(skipEl.value) : 1;
+            const sample = sampleEl ? parseInt(sampleEl.value) : 10;
+
+            const dimFactor = scale * scale;
+            const temporalFactor = 1 / skip;
+            const quantizeFactor = 1.0 - ((sample - 1) * 0.002);
+
+            predictedSize = activeFile.size * dimFactor * temporalFactor * quantizeFactor;
+
+        } else if (fileType === 'video') {
+            const bitrateEl = document.getElementById('param-bitrate');
+            const speedEl = document.getElementById('param-speed');
+            const audioEl = document.getElementById('param-audio');
+
+            const rateBps = bitrateEl ? parseInt(bitrateEl.value) : 200000;
+            const velocity = speedEl ? parseFloat(speedEl.value) : 2.0;
+            const stripAudio = audioEl ? audioEl.checked : false;
+
+            const duration = masterOrigVideo ? masterOrigVideo.duration : 0;
+
+            if (duration > 0) {
+                const recordedLength = duration / velocity;
+                const netBitrate = rateBps + (stripAudio ? 0 : 32000);
+                predictedSize = (netBitrate * recordedLength) / 8;
+            } else {
+                const scaleEl = document.getElementById('param-scale');
+                const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 0.5;
+                predictedSize = activeFile.size * (scale * scale) * (rateBps / 500000);
+            }
+        }
+
+        if (predictedSize < 128) predictedSize = 128;
+
+        // Render estimate profile only if final compressed asset has not been compiled yet
+        if (!compressedBlob) {
+            statNewSize.innerHTML = `~${formatBytes(predictedSize)} <span style="font-size:10px; color:var(--text-muted); font-weight:normal; letter-spacing:1px;">(ESTIMATE)</span>`;
+        }
     }
 
     processBtn.addEventListener('click', () => {
@@ -890,7 +1098,7 @@
 
         const img = layerOrigBox.querySelector('img');
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const ctx = canvas.getContext('2d');
 
         canvas.width = Math.max(1, Math.round(originalDimensions.width * scale));
         canvas.height = Math.max(1, Math.round(originalDimensions.height * scale));
@@ -911,7 +1119,7 @@
 
     function compressAnimatedGif() {
         if (typeof gifshot === 'undefined') {
-            alert("The runtime encoder library is still loading. Please wait 3 seconds and retry.");
+            alert("The runtime encoder library is still loading or was blocked by an extension. Please wait 3 seconds and retry.");
             processBtn.disabled = false;
             return;
         }
@@ -931,38 +1139,33 @@
                 const frameSkipRate = parseInt(document.getElementById('param-frameskip').value);
                 const quantizationSample = parseInt(document.getElementById('param-sample').value);
 
-                const targetW = Math.max(2, Math.round((width * scaleFactor) / 2) * 2);
-                const targetH = Math.max(2, Math.round((height * scaleFactor) / 2) * 2);
+                const targetW = Math.max(1, Math.round(width * scaleFactor));
+                const targetH = Math.max(1, Math.round(height * scaleFactor));
 
                 const stagingCanvas = document.createElement('canvas');
                 stagingCanvas.width = width;
                 stagingCanvas.height = height;
-                const stagingCtx = stagingCanvas.getContext('2d', { willReadFrequently: true });
+                const stagingCtx = stagingCanvas.getContext('2d');
 
                 const scaledCanvas = document.createElement('canvas');
                 scaledCanvas.width = targetW;
                 scaledCanvas.height = targetH;
-                const scaledCtx = scaledCanvas.getContext('2d', { willReadFrequently: true });
+                const scaledCtx = scaledCanvas.getContext('2d');
 
                 const frameExtractionDataURIs = [];
                 let accumulatedDelayDuration = 0;
                 let finalDeterminedInterval = 0.1;
                 let canvasCompositingPixelBuffer = new Uint8Array(width * height * 4);
-                
-                // Reused image data reference container saves heavy allocation calls inside loop loops
-                const frameDataContainer = stagingCtx.createImageData(width, height);
 
                 for (let i = 0; i < totalFrames; i++) {
                     const info = reader.frameInfo(i);
-                    
-                    // Fixed Bug: Always sequentially decode buffer states to avoid temporal animation artifacts
-                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
-                    
                     if (i % frameSkipRate !== 0 && i !== 0 && i !== totalFrames - 1) {
                         accumulatedDelayDuration += info.delay;
                         continue;
                     }
 
+                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
+                    const frameDataContainer = stagingCtx.createImageData(width, height);
                     frameDataContainer.data.set(canvasCompositingPixelBuffer);
                     stagingCtx.putImageData(frameDataContainer, 0, 0);
 
@@ -977,14 +1180,13 @@
                 progressBar.style.width = '45%';
                 progressText.textContent = 'Quantizing Matrix Textures...';
 
-                // Optimized for GitHub Pages: Enabled full multi-core parallel backgrounds threading
                 gifshot.createGIF({
                     images: frameExtractionDataURIs,
                     gifWidth: targetW,
                     gifHeight: targetH,
                     interval: finalDeterminedInterval || 0.1,
                     sampleInterval: quantizationSample,
-                    numWorkers: navigator.hardwareConcurrency || 4
+                    numWorkers: 0 
                 }, function(payloadObj) {
                     if (!payloadObj.error) {
                         progressBar.style.width = '90%';
@@ -1037,15 +1239,14 @@
         sourceVideo.playsInline = true;
 
         sourceVideo.onloadedmetadata = () => {
-            // Fixed Bug: Hardware video containers require multiples of 2 resolutions to record successfully
-            const targetWidth = Math.max(2, Math.round((originalDimensions.width * scale) / 2) * 2);
-            const targetHeight = Math.max(2, Math.round((originalDimensions.height * scale) / 2) * 2);
+            const targetWidth = Math.max(1, Math.round(originalDimensions.width * scale));
+            const targetHeight = Math.max(1, Math.round(originalDimensions.height * scale));
 
             const canvas = document.createElement('canvas');
             canvas.width = targetWidth;
             canvas.height = targetHeight;
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            const canvasStream = canvas.captureStream(fps);
+            const ctx = canvas.getContext('2d');
+            const canvasStream = canvas.captureStream(useOriginalFPS ? 0 : fps);
             
             if (!stripAudio) {
                 const nativeStream = sourceVideo.captureStream ? sourceVideo.captureStream() : (sourceVideo.mozCaptureStream ? sourceVideo.mozCaptureStream() : null);
@@ -1073,6 +1274,10 @@
                 badgeCompLabel.style.display = 'block';
                 finalizeOutput(outputBlob);
                 processBtn.disabled = false;
+                
+                compVideoElement.onloadedmetadata = () => {
+                    updateSyncStatusDisplay(masterOrigVideo ? masterOrigVideo.currentTime : 0);
+                };
             };
 
             let renderInterval;
@@ -1109,12 +1314,26 @@
             statEfficiency.innerHTML = `<span style="color: var(--text-muted)">+${Math.abs(efficiency).toFixed(2)}% (Swell)</span>`;
         }
         downloadBtn.classList.remove('hidden');
+        if (fileType === 'video') {
+            updateSyncStatusDisplay(masterOrigVideo ? masterOrigVideo.currentTime : 0);
+        }
     }
 
     downloadBtn.addEventListener('click', () => {
         if (!compressedBlob) return;
         const a = document.createElement('a');
-        let ext = fileType === 'image' ? (document.getElementById('param-format').value === 'image/webp' ? 'webp' : 'jpg') : (fileType === 'video' ? 'webm' : 'gif');
+        let ext = 'webm';
+        if (fileType === 'image') {
+            ext = (document.getElementById('param-format').value === 'image/webp' ? 'webp' : 'jpg');
+        } else if (fileType === 'gif') {
+            ext = 'gif';
+        } else if (fileType === 'video') {
+            const formatVal = document.getElementById('param-format').value;
+            if (formatVal.includes('mp4')) ext = 'mp4';
+            else if (formatVal.includes('matroska') || formatVal.includes('mkv')) ext = 'mkv';
+            else if (formatVal.includes('ogg')) ext = 'ogv';
+            else ext = 'webm';
+        }
         a.href = URL.createObjectURL(compressedBlob);
         a.download = `${customFilenameInput.value.trim() || 'crushed'}.${ext}`;
         document.body.appendChild(a);
