@@ -211,6 +211,7 @@
             appearance: none;
             width: 100%;
             background: transparent;
+            margin: 10px 0;
         }
 
         input[type="range"]:focus {
@@ -508,7 +509,7 @@
 <div class="container">
     <header>
         <h1>DATA_CRUSHER</h1>
-        <div class="version">SYS_V2.3.0_REVIVED</div>
+        <div class="version">SYS_V2.4.0_LIVE_ESTIMATE</div>
     </header>
 
     <div id="drop-zone">
@@ -590,7 +591,6 @@
 </div>
 
 <script>
-    // System script structural diagnostics check
     window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             if (typeof gifshot === 'undefined') {
@@ -640,7 +640,7 @@
     const statNewSize = document.getElementById('stat-new-size');
     const statEfficiency = document.getElementById('stat-efficiency');
 
-    // Attach dynamic real-time prediction handlers to config fields
+    // Attach dynamic real-time prediction handlers to config fields (catches all ranges, selects, checkboxes)
     configFields.addEventListener('input', updateSizePrediction);
     configFields.addEventListener('change', updateSizePrediction);
 
@@ -854,7 +854,6 @@
     }
 
     function setupVideoConfig() {
-        // Enumerate and build a wide array of platform supported format permutations
         const formatsToTest = [
             { value: 'video/webm', label: 'WebM Container (Standard)' },
             { value: 'video/webm;codecs=vp8', label: 'WebM (Legacy VP8 Codec)' },
@@ -1015,6 +1014,7 @@
         statusEl.innerHTML = infoStr;
     }
 
+    // Dynamic Size Estimation Logic
     function updateSizePrediction() {
         if (!activeFile) return;
         let predictedSize = activeFile.size;
@@ -1073,9 +1073,14 @@
 
         if (predictedSize < 128) predictedSize = 128;
 
-        // Render estimate profile only if final compressed asset has not been compiled yet
-        if (!compressedBlob) {
-            statNewSize.innerHTML = `~${formatBytes(predictedSize)} <span style="font-size:10px; color:var(--text-muted); font-weight:normal; letter-spacing:1px;">(ESTIMATE)</span>`;
+        // Force UI update to estimates
+        statNewSize.innerHTML = `~${formatBytes(predictedSize)} <span style="font-size:10px; color:var(--accent); font-weight:bold; letter-spacing:1px;">(EST)</span>`;
+        
+        const efficiency = ((activeFile.size - predictedSize) / activeFile.size) * 100;
+        if (efficiency > 0) {
+            statEfficiency.innerHTML = `<span class="reduction-badge">~${efficiency.toFixed(2)}% Saved</span>`;
+        } else {
+            statEfficiency.innerHTML = `<span style="color: var(--text-muted)">+${Math.abs(efficiency).toFixed(2)}% (Swell)</span>`;
         }
     }
 
@@ -1098,7 +1103,7 @@
 
         const img = layerOrigBox.querySelector('img');
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
         canvas.width = Math.max(1, Math.round(originalDimensions.width * scale));
         canvas.height = Math.max(1, Math.round(originalDimensions.height * scale));
@@ -1139,33 +1144,36 @@
                 const frameSkipRate = parseInt(document.getElementById('param-frameskip').value);
                 const quantizationSample = parseInt(document.getElementById('param-sample').value);
 
-                const targetW = Math.max(1, Math.round(width * scaleFactor));
-                const targetH = Math.max(1, Math.round(height * scaleFactor));
+                const targetW = Math.max(2, Math.round((width * scaleFactor) / 2) * 2);
+                const targetH = Math.max(2, Math.round((height * scaleFactor) / 2) * 2);
 
                 const stagingCanvas = document.createElement('canvas');
                 stagingCanvas.width = width;
                 stagingCanvas.height = height;
-                const stagingCtx = stagingCanvas.getContext('2d');
+                const stagingCtx = stagingCanvas.getContext('2d', { willReadFrequently: true });
 
                 const scaledCanvas = document.createElement('canvas');
                 scaledCanvas.width = targetW;
                 scaledCanvas.height = targetH;
-                const scaledCtx = scaledCanvas.getContext('2d');
+                const scaledCtx = scaledCanvas.getContext('2d', { willReadFrequently: true });
 
                 const frameExtractionDataURIs = [];
                 let accumulatedDelayDuration = 0;
                 let finalDeterminedInterval = 0.1;
                 let canvasCompositingPixelBuffer = new Uint8Array(width * height * 4);
+                
+                const frameDataContainer = stagingCtx.createImageData(width, height);
 
                 for (let i = 0; i < totalFrames; i++) {
                     const info = reader.frameInfo(i);
+                    
+                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
+                    
                     if (i % frameSkipRate !== 0 && i !== 0 && i !== totalFrames - 1) {
                         accumulatedDelayDuration += info.delay;
                         continue;
                     }
 
-                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
-                    const frameDataContainer = stagingCtx.createImageData(width, height);
                     frameDataContainer.data.set(canvasCompositingPixelBuffer);
                     stagingCtx.putImageData(frameDataContainer, 0, 0);
 
@@ -1186,7 +1194,7 @@
                     gifHeight: targetH,
                     interval: finalDeterminedInterval || 0.1,
                     sampleInterval: quantizationSample,
-                    numWorkers: 0 
+                    numWorkers: navigator.hardwareConcurrency || 4
                 }, function(payloadObj) {
                     if (!payloadObj.error) {
                         progressBar.style.width = '90%';
@@ -1239,13 +1247,13 @@
         sourceVideo.playsInline = true;
 
         sourceVideo.onloadedmetadata = () => {
-            const targetWidth = Math.max(1, Math.round(originalDimensions.width * scale));
-            const targetHeight = Math.max(1, Math.round(originalDimensions.height * scale));
+            const targetWidth = Math.max(2, Math.round((originalDimensions.width * scale) / 2) * 2);
+            const targetHeight = Math.max(2, Math.round((originalDimensions.height * scale) / 2) * 2);
 
             const canvas = document.createElement('canvas');
             canvas.width = targetWidth;
             canvas.height = targetHeight;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
             const canvasStream = canvas.captureStream(useOriginalFPS ? 0 : fps);
             
             if (!stripAudio) {
