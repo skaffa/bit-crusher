@@ -28,7 +28,7 @@
             -webkit-user-select: none;
         }
 
-        input[type="text"], input[type="number"], textarea {
+        input[type="text"], textarea {
             user-select: auto;
             -webkit-user-select: auto;
         }
@@ -131,6 +131,8 @@
             background: var(--panel);
             border: 1px solid var(--border);
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .panel-title {
@@ -203,9 +205,9 @@
             z-index: 100;
             text-transform: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
 
-        /* Root Input Range Configuration */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
@@ -218,14 +220,12 @@
             outline: none;
         }
 
-        /* WebKit/Blink standard sliders styling */
         input[type="range"]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
             background: var(--border);
             border: none;
         }
-
         input[type="range"]::-webkit-slider-thumb {
             height: 14px;
             width: 14px;
@@ -235,16 +235,19 @@
             cursor: pointer;
             -webkit-appearance: none;
             border-radius: 0;
+            transition: background 0.1s, transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--accent);
+            transform: scale(1.1);
         }
 
-        /* Firefox standard sliders styling */
         input[type="range"]::-moz-range-track {
             width: 100%;
             height: 4px;
             background: var(--border);
             border: none;
         }
-
         input[type="range"]::-moz-range-thumb {
             height: 14px;
             width: 14px;
@@ -252,9 +255,14 @@
             border: 1px solid var(--bg);
             cursor: pointer;
             border-radius: 0;
+            transition: background 0.1s, transform 0.1s;
+        }
+        input[type="range"]::-moz-range-thumb:hover {
+            background: var(--accent);
+            transform: scale(1.1);
         }
 
-        select, input[type="number"], input[type="text"] {
+        select, input[type="text"] {
             background: var(--bg);
             border: 1px solid var(--border);
             color: var(--text);
@@ -301,10 +309,6 @@
             cursor: not-allowed;
         }
 
-        #process-btn {
-            margin-top: 1.5rem;
-        }
-
         .mini-btn {
             width: auto;
             padding: 0.25rem 0.5rem;
@@ -318,10 +322,10 @@
         }
 
         .progress-container {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             border: 1px solid var(--border);
             background: var(--bg);
-            height: 20px;
+            height: 24px;
             position: relative;
             overflow: hidden;
         }
@@ -345,6 +349,7 @@
             font-family: var(--font-mono);
             font-size: 0.75rem;
             font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
         }
 
         .stats-table {
@@ -382,6 +387,7 @@
             grid-template-columns: 1fr;
             grid-template-rows: 1fr;
             overflow: hidden;
+            min-height: 250px;
         }
 
         .comp-layer {
@@ -396,7 +402,7 @@
         .comp-layer img, .comp-layer video {
             width: 100%;
             height: auto;
-            max-height: 65vh;
+            max-height: 60vh;
             object-fit: contain;
             display: block;
         }
@@ -410,7 +416,6 @@
             z-index: 1;
         }
 
-        /* Specialized Split View Layer Scrubber */
         .split-slider-input {
             position: absolute;
             top: 0;
@@ -425,35 +430,28 @@
             margin: 0;
         }
         
-        .split-slider-input::-webkit-slider-runnable-track { 
-            background: transparent !important; 
-            border: none !important; 
-            height: 100%; 
-        }
-
-        .split-slider-input::-moz-range-track { 
-            background: transparent !important; 
-            border: none !important; 
-            height: 100%; 
-        }
+        .split-slider-input::-webkit-slider-runnable-track { background: transparent !important; border: none !important; height: 100%; }
+        .split-slider-input::-moz-range-track { background: transparent !important; border: none !important; height: 100%; }
         
         .split-slider-input::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 4px;
+            width: 3px;
             height: 100%;
             background: var(--accent);
-            box-shadow: 0 0 14px var(--accent), 0 0 4px var(--accent);
+            box-shadow: 0 0 16px 2px var(--accent);
+            border: none;
             cursor: ew-resize;
         }
 
         .split-slider-input::-moz-range-thumb {
-            width: 4px;
+            width: 3px;
             height: 100%;
             background: var(--accent);
-            box-shadow: 0 0 14px var(--accent), 0 0 4px var(--accent);
+            box-shadow: 0 0 16px 2px var(--accent);
             border: none;
             cursor: ew-resize;
+            border-radius: 0;
         }
 
         .playback-deck {
@@ -509,7 +507,7 @@
 <div class="container">
     <header>
         <h1>DATA_CRUSHER</h1>
-        <div class="version">SYS_V2.4.0_LIVE_ESTIMATE</div>
+        <div class="version">SYS_V2.6.0_ULTRA</div>
     </header>
 
     <div id="drop-zone">
@@ -523,13 +521,13 @@
         
         <div class="panel">
             <div class="panel-title">Compression Parameters</div>
-            <div id="config-fields"></div>
+            <div id="config-fields" style="margin-bottom: 1rem;"></div>
             
             <button id="process-btn">Execute Compression</button>
 
             <div id="progress-wrapper" class="progress-container hidden">
                 <div id="progress-bar" class="progress-bar"></div>
-                <div id="progress-text" class="progress-text">0%</div>
+                <div id="progress-text" class="progress-text">0% [ETA: --:--]</div>
             </div>
         </div>
 
@@ -576,14 +574,14 @@
 
             <div class="control-group">
                 <div class="label-row">
-                    <label>Output Export Nomenclature</label>
+                    <label>Output Export Name</label>
                 </div>
                 <input type="text" id="param-filename" placeholder="Output file identifier...">
             </div>
 
             <button id="download-btn" class="hidden">Export Compressed Artifact</button>
             <div id="video-warning" class="info-block hidden">
-                * Note: Video crushing operates via real-time stream interception. Frame skips may occur under high workloads. Drop resolution or FPS scales lower for stable sizing.
+                * Note: Video encoding operates via stream capture. Processing speed profiles above 1x speed up audio pitch and shorten output length unless audio is stripped.
             </div>
         </div>
 
@@ -591,17 +589,6 @@
 </div>
 
 <script>
-    window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            if (typeof gifshot === 'undefined') {
-                console.warn("CDN runtime loading delayed. Running structural hot-patch injection script...");
-                const backupScript = document.createElement('script');
-                backupScript.src = "https://cdn.jsdelivr.net/npm/gifshot@0.4.5/dist/gifshot.min.js";
-                document.head.appendChild(backupScript);
-            }
-        }, 500);
-    });
-
     let activeFile = null;
     let fileType = null; 
     let originalDimensions = { width: 0, height: 0 };
@@ -611,6 +598,9 @@
 
     let masterOrigVideo = null;
     let slaveCompVideo = null;
+
+    // Tracking variables for real-time ETA engine calculations
+    let processStartTime = 0;
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -640,7 +630,7 @@
     const statNewSize = document.getElementById('stat-new-size');
     const statEfficiency = document.getElementById('stat-efficiency');
 
-    // Attach dynamic real-time prediction handlers to config fields (catches all ranges, selects, checkboxes)
+    // Handle estimation updates automatically when any parameter changes
     configFields.addEventListener('input', updateSizePrediction);
     configFields.addEventListener('change', updateSizePrediction);
 
@@ -673,6 +663,8 @@
         deckScrubber.value = 0;
         rawGifBuffer = null;
         document.getElementById('deck-sync-status').textContent = "";
+        layerOrigBox.innerHTML = '';
+        layerCompBox.innerHTML = '';
     }
 
     function fallbackToStaticImage(file) {
@@ -709,9 +701,6 @@
         statOrigSize.textContent = formatBytes(file.size);
         statNewSize.textContent = '-';
         statEfficiency.textContent = '-';
-        
-        layerOrigBox.innerHTML = '';
-        layerCompBox.innerHTML = '';
 
         const dotIdx = file.name.lastIndexOf('.');
         const baseName = dotIdx !== -1 ? file.name.substring(0, dotIdx) : file.name;
@@ -723,17 +712,7 @@
             reader.onload = function(e) {
                 rawGifBuffer = new Uint8Array(e.target.result);
                 try {
-                    let readerInstance;
-                    try {
-                        readerInstance = new GifReader(rawGifBuffer);
-                    } catch(binaryErr) {
-                        const healedBuffer = new Uint8Array(rawGifBuffer.length + 1);
-                        healedBuffer.set(rawGifBuffer);
-                        healedBuffer[rawGifBuffer.length] = 0x3B; 
-                        readerInstance = new GifReader(healedBuffer);
-                        rawGifBuffer = healedBuffer;
-                    }
-
+                    let readerInstance = new GifReader(rawGifBuffer);
                     originalDimensions.width = readerInstance.width;
                     originalDimensions.height = readerInstance.height;
                     
@@ -788,14 +767,14 @@
         configFields.innerHTML = `
             <div class="control-group">
                 <div class="label-row">
-                    <label>Spatial Bounds Scale <span class="value" id="val-scale">75%</span> <span class="tooltip-icon" data-tooltip="Resizes the physical dimensions of the GIF frames. Decreasing this heavily saves layout weight.">?</span></label>
+                    <label>Spatial Bounds Scale <span class="value" id="val-scale">75%</span> <span class="tooltip-icon" data-tooltip="Modifies physical output canvas bounding layout dimensions.">?</span></label>
                 </div>
                 <input type="range" id="param-scale" min="10" max="100" value="75" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
-                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${Math.round(originalDimensions.width * 0.75)}x${Math.round(originalDimensions.height * 0.75)}</div>
+                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${Math.round(originalDimensions.width * 0.75)}x${Math.round(originalDimensions.height * 0.75)} px</div>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Frame Decimation (Temporal Skip) <span class="tooltip-icon" data-tooltip="Subsamples target frames. Higher values drop frames to trim size at the cost of rendering fluidity.">?</span></label>
+                    <label>Frame Decimation (Temporal Skip) <span class="tooltip-icon" data-tooltip="Skips sequence frames to downsample spatial file overhead.">?</span></label>
                 </div>
                 <select id="param-frameskip">
                     <option value="1" selected>Maintain All Original Frames</option>
@@ -805,17 +784,19 @@
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Color Quantization Fidelity <span class="value" id="val-sample">10 (Standard)</span> <span class="tooltip-icon" data-tooltip="Controls color matching granularity. High sample levels extract fewer colors, shrinking output tables.">?</span></label>
+                    <label>Color Quantization Fidelity <span class="value" id="val-sample">10 (Standard)</span> <span class="tooltip-icon" data-tooltip="Sets palette color-mapping accuracy rules. Higher equals lower color weight.">?</span></label>
                 </div>
                 <input type="range" id="param-sample" min="1" max="30" value="10" oninput="document.getElementById('val-sample').textContent = this.value">
             </div>
         `;
 
-        document.getElementById('param-scale').addEventListener('input', function() {
+        const scaleEl = document.getElementById('param-scale');
+        const projEl = document.getElementById('resolution-projection');
+        scaleEl.addEventListener('input', function() {
             const mod = this.value / 100;
             const w = Math.max(1, Math.round(originalDimensions.width * mod));
             const h = Math.max(1, Math.round(originalDimensions.height * mod));
-            document.getElementById('resolution-projection').textContent = `Target: ${w}x${h}`;
+            projEl.textContent = `Target: ${w}x${h} px`;
         });
     }
 
@@ -823,46 +804,44 @@
         configFields.innerHTML = `
             <div class="control-group">
                 <div class="label-row">
-                    <label>Resolution Scale <span class="value" id="val-scale">100%</span> <span class="tooltip-icon" data-tooltip="Downscales image width/height bounds. Lower percentages mean fewer total processing pixels.">?</span></label>
+                    <label>Resolution Scale <span class="value" id="val-scale">100%</span> <span class="tooltip-icon" data-tooltip="Alters physical pixels layout sizes directly.">?</span></label>
                 </div>
                 <input type="range" id="param-scale" min="1" max="100" value="100" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
-                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${originalDimensions.width}x${originalDimensions.height}</div>
+                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${originalDimensions.width}x${originalDimensions.height} px</div>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Quality Factor <span class="value" id="val-quality">80%</span> <span class="tooltip-icon" data-tooltip="Adjusts lossy matrix compression factor. Lower values drop visual fidelity to shrink size.">?</span></label>
+                    <label>Quality Factor <span class="value" id="val-quality">80%</span> <span class="tooltip-icon" data-tooltip="Alters quantization matrix intensity rules.">?</span></label>
                 </div>
                 <input type="range" id="param-quality" min="1" max="100" value="80" oninput="document.getElementById('val-quality').textContent = this.value + '%'">
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Output Format Container <span class="tooltip-icon" data-tooltip="Changes the target compression layout format. WebP typically maintains better efficiency than standard JPEG.">?</span></label>
+                    <label>Output Format Container <span class="tooltip-icon" data-tooltip="Select container formatting rules. WEBP yields modern lossy layout density.">?</span></label>
                 </div>
                 <select id="param-format">
                     <option value="image/jpeg">JPEG (Lossy Standard)</option>
-                    <option value="image/webp" selected>WEBP (High Density)</option>
+                    <option value="image/webp" selected>WEBP (High Density Lossy)</option>
                 </select>
             </div>
         `;
         
-        document.getElementById('param-scale').addEventListener('input', function() {
+        const scaleEl = document.getElementById('param-scale');
+        const projEl = document.getElementById('resolution-projection');
+        scaleEl.addEventListener('input', function() {
             const mod = this.value / 100;
             const w = Math.max(1, Math.round(originalDimensions.width * mod));
             const h = Math.max(1, Math.round(originalDimensions.height * mod));
-            document.getElementById('resolution-projection').textContent = `Target: ${w}x${h}`;
+            projEl.textContent = `Target: ${w}x${h} px`;
         });
     }
 
     function setupVideoConfig() {
         const formatsToTest = [
-            { value: 'video/webm', label: 'WebM Container (Standard)' },
-            { value: 'video/webm;codecs=vp8', label: 'WebM (Legacy VP8 Codec)' },
-            { value: 'video/webm;codecs=vp9', label: 'WebM (High Efficiency VP9)' },
-            { value: 'video/webm;codecs=h264', label: 'WebM (H.264 Streams)' },
-            { value: 'video/mp4', label: 'MP4 Container (Standard)' },
-            { value: 'video/mp4;codecs=avc1', label: 'MP4 (AVC1 / H.264 Encoder)' },
-            { value: 'video/x-matroska', label: 'Matroska File (MKV Container)' },
-            { value: 'video/ogg', label: 'Ogg Container (Theora)' }
+            { value: 'video/webm;codecs=vp9', label: 'WebM (High Density VP9)' },
+            { value: 'video/webm;codecs=vp8', label: 'WebM (Standard VP8)' },
+            { value: 'video/mp4;codecs=avc1', label: 'MP4 Container (H.264 Encoder)' },
+            { value: 'video/webm', label: 'WebM Standard Container' }
         ];
         
         let formatOptions = '';
@@ -871,56 +850,68 @@
                 formatOptions += `<option value="${f.value}">${f.label}</option>`;
             }
         });
-        if (!formatOptions) {
-            formatOptions = `<option value="video/webm">WebM Container</option>`;
-        }
+        if (!formatOptions) formatOptions = `<option value="video/webm">WebM Standard Container</option>`;
         
         configFields.innerHTML = `
             <div class="control-group">
                 <div class="label-row">
-                    <label>Resolution Scale <span class="value" id="val-scale">50%</span> <span class="tooltip-icon" data-tooltip="Alters video canvas recording bounds. Drop down to significantly lessen streaming bitrate weight.">?</span></label>
+                    <label>Resolution Scale <span class="value" id="val-scale">50%</span> <span class="tooltip-icon" data-tooltip="Reduces targeted video dimensions. Lower scales dramatically improve bitrate tracking clarity.">?</span></label>
                 </div>
-                <input type="range" id="param-scale" min="1" max="100" value="50" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
+                <input type="range" id="param-scale" min="10" max="100" value="50" oninput="document.getElementById('val-scale').textContent = this.value + '%'">
+                <div style="font-family: var(--font-mono); font-size:11px; margin-top:4px; color: var(--text-muted);" id="resolution-projection">Target: ${Math.max(2, Math.round((originalDimensions.width * 0.5)/2)*2)}x${Math.max(2, Math.round((originalDimensions.height * 0.5)/2)*2)} px</div>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Framerate Constraint <span class="value" id="val-fps">15 FPS</span> <span class="tooltip-icon" data-tooltip="Locks the target frame polling rate. Lower values produce a staccato style but decrease file weight.">?</span></label>
+                    <label>Framerate Constraint <span class="value" id="val-fps">15 FPS</span> <span class="tooltip-icon" data-tooltip="Limits temporal sequence update caps per standard tracking frame block.">?</span></label>
                     <button type="button" id="btn-orig-fps" class="mini-btn" onclick="toggleNativeFPS()">Match Source</button>
                 </div>
                 <input type="range" id="param-fps" min="1" max="60" value="15" oninput="document.getElementById('val-fps').textContent = this.value + ' FPS'">
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Target Bitrate <span class="tooltip-icon" data-tooltip="Sets strict target stream allowance budget. Low bitrates yield small weights but introduce blocky layout artifacts.">?</span></label>
+                    <label>Target Bitrate (Global Choke) <span class="tooltip-icon" data-tooltip="Strictly locks calculation space boundaries. Directly governs mathematical target payload mass.">?</span></label>
                 </div>
                 <select id="param-bitrate">
                     <option value="10000">10 Kbps (Ultra Crush)</option>
                     <option value="50000">50 Kbps (Highly Compressed)</option>
                     <option value="200000" selected>200 Kbps (Standard Mobile Quality)</option>
                     <option value="800000">800 Kbps (Moderate Quality)</option>
+                    <option value="2000000">2 Mbps (High Bandwidth)</option>
                 </select>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Process Speed Throttle <span class="tooltip-icon" data-tooltip="Accelerates canvas capture via accelerated reproduction. Fast sweeps risk drops on slower devices.">?</span></label>
+                    <label>Process Speed Profile <span class="tooltip-icon" data-tooltip="Controls playback pipeline rate interception speed. High velocities pitch up audio tracks.">?</span></label>
                 </div>
                 <select id="param-speed">
-                    <option value="1">1x (Safest Execution)</option>
-                    <option value="2" selected>2x (Accelerated Pass)</option>
+                    <option value="0.5">0.5x Mode // Extended Pipeline Stability</option>
+                    <option value="1">1.0x Mode // Standard Realtime (Keeps Audio Pitch Intact)</option>
+                    <option value="2" selected>2.0x Mode // Accelerated Canvas Processing Pass</option>
+                    <option value="4">4.0x Mode // High Velocity Interception</option>
+                    <option value="8">8.0x Mode // Max Engine Stress Profile</option>
                 </select>
             </div>
             <div class="control-group">
                 <div class="label-row">
-                    <label>Output Container Form <span class="tooltip-icon" data-tooltip="Media wrapper container layout. Supported types rely on browser platform subsystem capabilities.">?</span></label>
+                    <label>Output Container Form</label>
                 </div>
                 <select id="param-format">${formatOptions}</select>
             </div>
-            <div class="control-group" style="margin-bottom: 2rem;">
+            <div class="control-group" style="margin-bottom: 1.5rem;">
                 <label class="checkbox-group">
-                    <input type="checkbox" id="param-audio"> <span>Strip Audio Node Track</span> <span class="tooltip-icon" data-tooltip="Purges all track audio feeds to maximize data space retrieval.">?</span>
+                    <input type="checkbox" id="param-audio"> <span>Strip Audio Node Track <span class="tooltip-icon" data-tooltip="Removes the audio multiplex floor, preventing minimum track weight overhead expansion.">?</span></span>
                 </label>
             </div>
         `;
+
+        const scaleEl = document.getElementById('param-scale');
+        const projEl = document.getElementById('resolution-projection');
+        scaleEl.addEventListener('input', function() {
+            const mod = this.value / 100;
+            const w = Math.max(2, Math.round((originalDimensions.width * mod) / 2) * 2);
+            const h = Math.max(2, Math.round((originalDimensions.height * mod) / 2) * 2);
+            projEl.textContent = `Target: ${w}x${h} px`;
+        });
     }
 
     function toggleNativeFPS() {
@@ -951,7 +942,7 @@
             
             let timeText = `${formatTime(cur)} / ${formatTime(dur)}`;
             if (slaveCompVideo && slaveCompVideo.duration) {
-                timeText += ` [Crushed Length: ${formatTime(slaveCompVideo.duration)}]`;
+                timeText += ` // [Result Length: ${formatTime(slaveCompVideo.duration)}]`;
             }
             deckTimeDisplay.textContent = timeText;
             
@@ -992,101 +983,108 @@
 
     function updateSyncStatusDisplay(cur) {
         const statusEl = document.getElementById('deck-sync-status');
-        if (!statusEl) return;
-        if (!slaveCompVideo) {
-            statusEl.innerHTML = "Sync Profile: Awaiting compression processing...";
-            return;
-        }
+        if (!statusEl || !slaveCompVideo) return;
 
         const compDur = slaveCompVideo.duration || 0;
-        let infoStr = `Resulting Length: ${formatTime(compDur)}`;
-
         if (cur > compDur) {
-            infoStr += ` // <span style="color: var(--accent); font-weight: bold;">⚠️ DESYNCED (Crushed stream ended early at ${formatTime(compDur)})</span>`;
+            statusEl.innerHTML = `<span style="color: var(--accent); font-weight: bold;">⚠️ DESYNC ALERT: Output segment runtime ended at ${formatTime(compDur)} (Process Acceleration Artifact).</span>`;
         } else {
             const diff = Math.abs(cur - slaveCompVideo.currentTime);
             if (diff > 0.3) {
-                infoStr += ` // <span style="color: var(--accent);">⚠️ DRIFT DETECTION (${diff.toFixed(1)}s timeline lag)</span>`;
+                statusEl.innerHTML = `<span style="color: var(--accent);">⚠️ DRIFT ALERT: Capture stream tracking shows a latency offset of ${diff.toFixed(1)}s.</span>`;
             } else {
-                infoStr += ` // <span style="color: #4ade80;">✓ Fully Synchronized with Original</span>`;
+                statusEl.innerHTML = `<span style="color: #4ade80;">✓ Media Track Synchronized</span>`;
             }
         }
-        statusEl.innerHTML = infoStr;
     }
 
-    // Dynamic Size Estimation Logic
     function updateSizePrediction() {
         if (!activeFile) return;
         let predictedSize = activeFile.size;
 
         if (fileType === 'image') {
-            const scaleEl = document.getElementById('param-scale');
-            const qualityEl = document.getElementById('param-quality');
-            const formatEl = document.getElementById('param-format');
+            const scale = (document.getElementById('param-scale') ? parseInt(document.getElementById('param-scale').value) : 100) / 100;
+            const quality = (document.getElementById('param-quality') ? parseInt(document.getElementById('param-quality').value) : 80) / 100;
+            const format = document.getElementById('param-format') ? document.getElementById('param-format').value : 'image/webp';
 
-            const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 1.0;
-            const quality = qualityEl ? parseInt(qualityEl.value) / 100 : 0.8;
-            const format = formatEl ? formatEl.value : 'image/webp';
+            const baseMod = scale * scale;
+            const qualityMod = 0.15 + (0.85 * quality);
+            const formatMod = (format === 'image/webp') ? 0.75 : 1.0;
 
-            const dimFactor = scale * scale;
-            const qualityFactor = 0.15 + 0.85 * quality;
-            const containerFactor = (format === 'image/webp') ? 0.78 : 1.0;
-
-            predictedSize = activeFile.size * dimFactor * qualityFactor * containerFactor;
+            predictedSize = activeFile.size * baseMod * qualityMod * formatMod;
 
         } else if (fileType === 'gif') {
-            const scaleEl = document.getElementById('param-scale');
-            const skipEl = document.getElementById('param-frameskip');
-            const sampleEl = document.getElementById('param-sample');
+            const scale = (document.getElementById('param-scale') ? parseInt(document.getElementById('param-scale').value) : 75) / 100;
+            const skip = document.getElementById('param-frameskip') ? parseInt(document.getElementById('param-frameskip').value) : 1;
+            const sample = document.getElementById('param-sample') ? parseInt(document.getElementById('param-sample').value) : 10;
 
-            const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 0.75;
-            const skip = skipEl ? parseInt(skipEl.value) : 1;
-            const sample = sampleEl ? parseInt(sampleEl.value) : 10;
+            const baseMod = scale * scale;
+            const frameMod = 1 / skip;
+            const quantizeMod = 1.0 - ((sample - 1) * 0.002);
 
-            const dimFactor = scale * scale;
-            const temporalFactor = 1 / skip;
-            const quantizeFactor = 1.0 - ((sample - 1) * 0.002);
-
-            predictedSize = activeFile.size * dimFactor * temporalFactor * quantizeFactor;
+            predictedSize = activeFile.size * baseMod * frameMod * quantizeMod;
 
         } else if (fileType === 'video') {
-            const bitrateEl = document.getElementById('param-bitrate');
-            const speedEl = document.getElementById('param-speed');
-            const audioEl = document.getElementById('param-audio');
-
-            const rateBps = bitrateEl ? parseInt(bitrateEl.value) : 200000;
-            const velocity = speedEl ? parseFloat(speedEl.value) : 2.0;
-            const stripAudio = audioEl ? audioEl.checked : false;
-
+            const rateBps = document.getElementById('param-bitrate') ? parseInt(document.getElementById('param-bitrate').value) : 200000;
+            const velocity = document.getElementById('param-speed') ? parseFloat(document.getElementById('param-speed').value) : 2.0;
+            const stripAudio = document.getElementById('param-audio') ? document.getElementById('param-audio').checked : false;
             const duration = masterOrigVideo ? masterOrigVideo.duration : 0;
 
             if (duration > 0) {
-                const recordedLength = duration / velocity;
-                const netBitrate = rateBps + (stripAudio ? 0 : 32000);
-                predictedSize = (netBitrate * recordedLength) / 8;
+                const physicalTargetDuration = duration / velocity;
+                const baselineAudioAllocation = stripAudio ? 0 : 64000; 
+                const aggregateChokeBitrate = rateBps + baselineAudioAllocation;
+                predictedSize = (aggregateChokeBitrate * physicalTargetDuration) / 8;
             } else {
-                const scaleEl = document.getElementById('param-scale');
-                const scale = scaleEl ? parseInt(scaleEl.value) / 100 : 0.5;
-                predictedSize = activeFile.size * (scale * scale) * (rateBps / 500000);
+                const scale = (document.getElementById('param-scale') ? parseInt(document.getElementById('param-scale').value) : 50) / 100;
+                predictedSize = activeFile.size * (scale * scale) * (rateBps / 600000);
             }
         }
 
-        if (predictedSize < 128) predictedSize = 128;
+        if (predictedSize < 256) predictedSize = 256;
 
-        // Force UI update to estimates
-        statNewSize.innerHTML = `~${formatBytes(predictedSize)} <span style="font-size:10px; color:var(--accent); font-weight:bold; letter-spacing:1px;">(EST)</span>`;
+        if (!compressedBlob) {
+            statNewSize.innerHTML = `~${formatBytes(predictedSize)} <span style="font-size:10px; color:var(--accent); font-weight:bold; letter-spacing:0.5px;">(EST)</span>`;
+            const efficiency = ((activeFile.size - predictedSize) / activeFile.size) * 100;
+            if (efficiency > 0) {
+                statEfficiency.innerHTML = `<span class="reduction-badge">~${efficiency.toFixed(2)}% Target Cut</span>`;
+            } else {
+                statEfficiency.innerHTML = `<span style="color: var(--text-muted)">+${Math.abs(efficiency).toFixed(2)}% Swell</span>`;
+            }
+        }
+    }
+
+    function refreshProgressDisplay(percentComplete) {
+        percentComplete = Math.min(100, Math.max(0, percentComplete));
+        progressBar.style.width = `${percentComplete}%`;
         
-        const efficiency = ((activeFile.size - predictedSize) / activeFile.size) * 100;
-        if (efficiency > 0) {
-            statEfficiency.innerHTML = `<span class="reduction-badge">~${efficiency.toFixed(2)}% Saved</span>`;
+        if (percentComplete <= 0) {
+            progressText.textContent = `0% [ETA: --:--]`;
+            return;
+        }
+
+        const timeElapsed = (performance.now() - processStartTime) / 1000;
+        const processingVelocity = percentComplete / timeElapsed; // Progress percentage items processed per second
+        const percentageRemaining = 100 - percentComplete;
+        const estimatedSecondsRemaining = percentageRemaining / processingVelocity;
+
+        let etaString = "--:--";
+        if (isFinite(estimatedSecondsRemaining) && estimatedSecondsRemaining >= 0) {
+            etaString = formatTime(estimatedSecondsRemaining);
+        }
+
+        if (percentComplete >= 100) {
+            progressText.textContent = "Processing Execution Complete";
         } else {
-            statEfficiency.innerHTML = `<span style="color: var(--text-muted)">+${Math.abs(efficiency).toFixed(2)}% (Swell)</span>`;
+            progressText.textContent = `${Math.round(percentComplete)}% [ETA: ${etaString}]`;
         }
     }
 
     processBtn.addEventListener('click', () => {
         if (!activeFile) return;
         processBtn.disabled = true;
+        processStartTime = performance.now();
+        
         if (fileType === 'image') compressImage();
         else if (fileType === 'video') compressVideo();
         else if (fileType === 'gif') compressAnimatedGif();
@@ -1094,8 +1092,7 @@
 
     function compressImage() {
         progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '50%';
-        progressText.textContent = 'Processing Image...';
+        refreshProgressDisplay(25);
 
         const scale = document.getElementById('param-scale').value / 100;
         const quality = document.getElementById('param-quality').value / 100;
@@ -1107,31 +1104,27 @@
 
         canvas.width = Math.max(1, Math.round(originalDimensions.width * scale));
         canvas.height = Math.max(1, Math.round(originalDimensions.height * scale));
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob((blob) => {
-            progressBar.style.width = '100%';
-            progressText.textContent = 'Complete';
-            layerCompBox.innerHTML = '';
-            const outImg = new Image();
-            outImg.src = URL.createObjectURL(blob);
-            layerCompBox.appendChild(outImg);
-            badgeCompLabel.style.display = 'block';
-            finalizeOutput(blob);
-            processBtn.disabled = false;
-        }, format, quality);
+        
+        setTimeout(() => {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            refreshProgressDisplay(70);
+            
+            canvas.toBlob((blob) => {
+                refreshProgressDisplay(100);
+                layerCompBox.innerHTML = '';
+                const outImg = new Image();
+                outImg.src = URL.createObjectURL(blob);
+                layerCompBox.appendChild(outImg);
+                badgeCompLabel.style.display = 'block';
+                finalizeOutput(blob);
+                processBtn.disabled = false;
+            }, format, quality);
+        }, 50);
     }
 
     function compressAnimatedGif() {
-        if (typeof gifshot === 'undefined') {
-            alert("The runtime encoder library is still loading or was blocked by an extension. Please wait 3 seconds and retry.");
-            processBtn.disabled = false;
-            return;
-        }
-
         progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '15%';
-        progressText.textContent = 'Parsing Binary Frames...';
+        refreshProgressDisplay(5);
 
         setTimeout(() => {
             try {
@@ -1161,19 +1154,16 @@
                 let accumulatedDelayDuration = 0;
                 let finalDeterminedInterval = 0.1;
                 let canvasCompositingPixelBuffer = new Uint8Array(width * height * 4);
-                
                 const frameDataContainer = stagingCtx.createImageData(width, height);
 
                 for (let i = 0; i < totalFrames; i++) {
                     const info = reader.frameInfo(i);
-                    
-                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
-                    
                     if (i % frameSkipRate !== 0 && i !== 0 && i !== totalFrames - 1) {
                         accumulatedDelayDuration += info.delay;
                         continue;
                     }
 
+                    reader.decodeAndBlitFrameRGBA(i, canvasCompositingPixelBuffer);
                     frameDataContainer.data.set(canvasCompositingPixelBuffer);
                     stagingCtx.putImageData(frameDataContainer, 0, 0);
 
@@ -1185,8 +1175,7 @@
                     accumulatedDelayDuration = 0;
                 }
 
-                progressBar.style.width = '45%';
-                progressText.textContent = 'Quantizing Matrix Textures...';
+                refreshProgressDisplay(30);
 
                 gifshot.createGIF({
                     images: frameExtractionDataURIs,
@@ -1194,17 +1183,15 @@
                     gifHeight: targetH,
                     interval: finalDeterminedInterval || 0.1,
                     sampleInterval: quantizationSample,
-                    numWorkers: navigator.hardwareConcurrency || 4
+                    numWorkers: 0 
                 }, function(payloadObj) {
                     if (!payloadObj.error) {
-                        progressBar.style.width = '90%';
-                        progressText.textContent = 'Writing Output Data...';
+                        refreshProgressDisplay(90);
 
                         fetch(payloadObj.image)
                             .then(res => res.blob())
                             .then(blob => {
-                                progressBar.style.width = '100%';
-                                progressText.textContent = 'Compression Successful';
+                                refreshProgressDisplay(100);
                                 layerCompBox.innerHTML = '';
                                 const compressedAnimatedGifDisplay = document.createElement('img');
                                 compressedAnimatedGifDisplay.src = URL.createObjectURL(blob);
@@ -1214,13 +1201,13 @@
                                 processBtn.disabled = false;
                             });
                     } else {
-                        alert("Quantization calculation space exceeded.");
+                        alert("Quantization calculations processing space exceeded boundaries.");
                         processBtn.disabled = false;
                     }
                 });
 
             } catch (err) {
-                alert("GIF Engine Core Exception: " + err.message);
+                alert("GIF Engine Failure Trace Exception: " + err.message);
                 processBtn.disabled = false;
             }
         }, 60);
@@ -1228,8 +1215,7 @@
 
     function compressVideo() {
         progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '0%';
-        progressText.textContent = 'Initializing stream...';
+        refreshProgressDisplay(1);
 
         const scale = document.getElementById('param-scale').value / 100;
         const fps = useOriginalFPS ? 30 : parseInt(document.getElementById('param-fps').value); 
@@ -1254,6 +1240,7 @@
             canvas.width = targetWidth;
             canvas.height = targetHeight;
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            
             const canvasStream = canvas.captureStream(useOriginalFPS ? 0 : fps);
             
             if (!stripAudio) {
@@ -1273,19 +1260,17 @@
             recorder.onstop = () => {
                 const outputBlob = new Blob(chunks, { type: format });
                 layerCompBox.innerHTML = '';
+                
                 const compVideoElement = document.createElement('video');
                 compVideoElement.src = URL.createObjectURL(outputBlob);
                 compVideoElement.muted = true;
                 compVideoElement.playsInline = true;
+                
                 layerCompBox.appendChild(compVideoElement);
                 slaveCompVideo = compVideoElement;
                 badgeCompLabel.style.display = 'block';
                 finalizeOutput(outputBlob);
                 processBtn.disabled = false;
-                
-                compVideoElement.onloadedmetadata = () => {
-                    updateSyncStatusDisplay(masterOrigVideo ? masterOrigVideo.currentTime : 0);
-                };
             };
 
             let renderInterval;
@@ -1293,20 +1278,20 @@
                 recorder.start();
                 renderInterval = setInterval(() => {
                     ctx.drawImage(sourceVideo, 0, 0, targetWidth, targetHeight);
-                    const currentProgress = (sourceVideo.currentTime / sourceVideo.duration) * 100;
-                    progressBar.style.width = `${currentProgress}%`;
-                    progressText.textContent = `${Math.round(currentProgress)}%`;
+                    const sequencePct = (sourceVideo.currentTime / sourceVideo.duration) * 100;
+                    refreshProgressDisplay(sequencePct);
                 }, 1000 / fps);
             };
 
             sourceVideo.onended = () => {
                 clearInterval(renderInterval);
+                refreshProgressDisplay(100);
                 recorder.stop();
             };
 
             sourceVideo.playbackRate = speedMultiplier;
             sourceVideo.play().catch(() => {
-                alert("Video pipeline acceleration rejected by system host.");
+                alert("The browser host pipeline rejected accelerated execution properties.");
                 processBtn.disabled = false;
             });
         };
@@ -1322,25 +1307,19 @@
             statEfficiency.innerHTML = `<span style="color: var(--text-muted)">+${Math.abs(efficiency).toFixed(2)}% (Swell)</span>`;
         }
         downloadBtn.classList.remove('hidden');
-        if (fileType === 'video') {
-            updateSyncStatusDisplay(masterOrigVideo ? masterOrigVideo.currentTime : 0);
-        }
     }
 
     downloadBtn.addEventListener('click', () => {
         if (!compressedBlob) return;
         const a = document.createElement('a');
-        let ext = 'webm';
+        let ext = "webm";
         if (fileType === 'image') {
-            ext = (document.getElementById('param-format').value === 'image/webp' ? 'webp' : 'jpg');
+            ext = document.getElementById('param-format').value === 'image/webp' ? 'webp' : 'jpg';
         } else if (fileType === 'gif') {
             ext = 'gif';
         } else if (fileType === 'video') {
-            const formatVal = document.getElementById('param-format').value;
-            if (formatVal.includes('mp4')) ext = 'mp4';
-            else if (formatVal.includes('matroska') || formatVal.includes('mkv')) ext = 'mkv';
-            else if (formatVal.includes('ogg')) ext = 'ogv';
-            else ext = 'webm';
+            const currentMime = document.getElementById('param-format').value;
+            ext = currentMime.includes('mp4') ? 'mp4' : 'webm';
         }
         a.href = URL.createObjectURL(compressedBlob);
         a.download = `${customFilenameInput.value.trim() || 'crushed'}.${ext}`;
@@ -1350,7 +1329,7 @@
     });
 
     function formatBytes(bytes) {
-        if (bytes === 0) return '0 B';
+        if (bytes === 0) return '0 Bytes';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
