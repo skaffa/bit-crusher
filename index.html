@@ -1002,6 +1002,15 @@
             </div>
             <div class="control-group">
                 <div class="label-row">
+                    <label>Bitrate Mode <span class="tooltip-icon" data-tooltip="Constant strictly respects the bitrate. Variable adjusts for complexity (often saving ~15% space).">?</span></label>
+                </div>
+                <select id="param-bitratemode" onchange="updateSizePrediction()">
+                    <option value="constant" selected>Constant Bitrate (CBR)</option>
+                    <option value="variable">Variable Bitrate (VBR)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <div class="label-row">
                     <label>Process Speed Profile <span class="tooltip-icon" data-tooltip="Controls playback pipeline rate interception speed. High velocities pitch up audio tracks.">?</span></label>
                 </div>
                 <select id="param-speed">
@@ -1054,12 +1063,12 @@
             }
             formatSelect.disabled = true;
             speedSelect.disabled = true;
-            fpsSelect.disabled = true;
-            btnOrigFps.disabled = true;
+            fpsSelect.disabled = false;
+            btnOrigFps.disabled = false;
         } else {
             formatSelect.disabled = false;
             speedSelect.disabled = false;
-            fpsSelect.disabled = useOriginalFPS;
+            fpsSelect.disabled = false;
             btnOrigFps.disabled = false;
         }
         updateSizePrediction();
@@ -1189,6 +1198,12 @@
             } else {
                 const scale = (document.getElementById('param-scale') ? parseInt(document.getElementById('param-scale').value) : 50) / 100;
                 predictedSize = activeFile.size * (scale * scale) * (rateBps / 600000);
+            }
+            
+            const engine = document.getElementById('param-engine') ? document.getElementById('param-engine').value : 'canvas';
+            const bitrateMode = document.getElementById('param-bitratemode') ? document.getElementById('param-bitratemode').value : 'constant';
+            if (engine === 'webcodecs' && bitrateMode === 'variable') {
+                predictedSize = predictedSize * 0.85;
             }
         }
 
@@ -1563,6 +1578,8 @@
 
         const targetBitrate = parseInt(document.getElementById('param-bitrate').value);
         const targetScale = parseFloat(document.getElementById('param-scale').value) / 100;
+        const targetFps = parseInt(document.getElementById('param-fps').value);
+        const targetBitrateMode = document.getElementById('param-bitratemode').value;
 
         getSession(activeSessionId).then((sessionRecord) => {
             worker.postMessage({
@@ -1571,7 +1588,7 @@
                 fileHandle: targetHandle,
                 isResuming: isResuming,
                 startSampleIndex: (isResuming && sessionRecord) ? sessionRecord.savedSampleIndex : 0,
-                config: { bitrate: targetBitrate, scale: targetScale }
+                config: { bitrate: targetBitrate, scale: targetScale, fps: targetFps, bitrateMode: targetBitrateMode }
             });
         });
     }
@@ -1642,15 +1659,21 @@
                         width: computedWidth,
                         height: computedHeight,
                         bitrate: config.bitrate,
-                        framerate: 30,
+                        framerate: config.fps,
+                        bitrateMode: config.bitrateMode,
                         latencyMode: 'quality'
                     });
+
+                    let nextTargetTimestamp = 0;
 
                     // Define System Video Decoder pipeline
                     decoder = new VideoDecoder({
                         output: (frame) => {
-                            // Scale conversions are handled natively on the hardware matrix during encryption pass
-                            encoder.encode(frame);
+                            if (frame.timestamp >= nextTargetTimestamp) {
+                                // Scale conversions are handled natively on the hardware matrix during encryption pass
+                                encoder.encode(frame);
+                                nextTargetTimestamp += (1000000 / config.fps);
+                            }
                             frame.close();
                         },
                         error: (err) => self.postMessage({ type: 'ERROR', error: 'Hardware Decoder Constraint: ' + err.message })
