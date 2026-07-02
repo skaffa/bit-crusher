@@ -1250,31 +1250,9 @@
         gatekeeperModal.style.display = 'flex';
     });
 
-    document.getElementById('auth-btn').addEventListener('click', async () => {
-        try {
-            fileHandle = await window.showSaveFilePicker({
-                suggestedName: `${customFilenameInput.value.trim() || 'crushed'}.webm`,
-                types: [{ description: 'Compressed WebM Track', accept: { 'video/webm': ['.webm'] } }]
-            });
-            gatekeeperModal.style.display = 'none';
-            const isResuming = !resumeBtn.classList.contains('hidden') && processBtn.textContent === "Restart Clean" === false; // If processBtn was clicked instead of resume, don't resume
-            // Wait, resumeBtn click triggers this, but we need to know if we are resuming. Let's just pass a global var or check if resumeBtn was clicked.
-            // Simplified: we will just check if we clicked resume by setting a variable.
-        } catch (err) {
-            gatekeeperModal.style.display = 'none';
-            return;
-        }
-    });
-
     let isResumingGlobal = false;
     processBtn.addEventListener('mousedown', () => isResumingGlobal = false);
     resumeBtn.addEventListener('mousedown', () => isResumingGlobal = true);
-
-    document.getElementById('auth-btn').addEventListener('click', async () => {
-        if(!fileHandle) { // Just in case it wasn't picked yet
-           // Handled above. But wait, I overwrote the click handler. Let me combine them properly.
-        }
-    });
 
 
     function compressImage() {
