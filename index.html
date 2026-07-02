@@ -1577,7 +1577,7 @@
 <script type="text/worker" id="worker-code">
     // Load native JS Demuxers and Muxers inside the isolated thread background layer
     importScripts('https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js');
-    importScripts('https://cdn.jsdelivr.net/npm/webm-muxer@3.3.0/build/webm-muxer.js');
+    importScripts('https://cdn.jsdelivr.net/npm/webm-muxer@5.1.4/build/webm-muxer.js');
 
     self.onmessage = async (e) => {
         if (e.data.type === 'START') {
