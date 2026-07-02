@@ -988,13 +988,17 @@
                 <div class="label-row">
                     <label>Target Bitrate (Global Choke) <span class="tooltip-icon" data-tooltip="Strictly locks calculation space boundaries. Directly governs mathematical target payload mass.">?</span></label>
                 </div>
-                <select id="param-bitrate">
-                    <option value="10000">10 Kbps (Ultra Crush)</option>
-                    <option value="50000">50 Kbps (Highly Compressed)</option>
-                    <option value="200000" selected>200 Kbps (Standard Mobile Quality)</option>
-                    <option value="800000">800 Kbps (Moderate Quality)</option>
-                    <option value="2000000">2 Mbps (High Bandwidth)</option>
-                </select>
+                <div style="display: flex; gap: 0.5rem; width: 100%;">
+                    <select id="param-bitrate-select" style="flex: 1;" onchange="const inp = document.getElementById('param-bitrate'); if(this.value !== 'custom') { inp.value = this.value; inp.style.display = 'none'; } else { inp.style.display = 'block'; inp.focus(); } inp.dispatchEvent(new Event('input', {bubbles: true}));">
+                        <option value="10000">10 Kbps (Ultra Crush)</option>
+                        <option value="50000">50 Kbps (Highly Compressed)</option>
+                        <option value="200000" selected>200 Kbps (Standard Mobile Quality)</option>
+                        <option value="800000">800 Kbps (Moderate Quality)</option>
+                        <option value="2000000">2 Mbps (High Bandwidth)</option>
+                        <option value="custom">Custom (bps)...</option>
+                    </select>
+                    <input type="number" id="param-bitrate" min="1" style="display: none; width: 120px; font-family: var(--font-mono); font-size: 0.85rem; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); color: var(--text);" value="200000">
+                </div>
             </div>
             <div class="control-group">
                 <div class="label-row">
@@ -1616,8 +1620,8 @@
                     const computedHeight = Math.max(2, Math.round((nativeHeight * config.scale) / 2) * 2);
 
                     // Initialize the RAM-Free Streaming Disk Muxer Target
-                    muxer = new WebmMuxer.Muxer({
-                        target: writableStream ? new WebmMuxer.StreamTarget(writableStream) : new WebmMuxer.ArrayBufferTarget(),
+                    muxer = new WebMMuxer.Muxer({
+                        target: writableStream ? new WebMMuxer.StreamTarget(writableStream) : new WebMMuxer.ArrayBufferTarget(),
                         video: {
                             codec: 'V_VP9',
                             width: computedWidth,
